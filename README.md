@@ -1,18 +1,8 @@
 # Wall of Tracks
 
-Une affiche interactive générée à partir des écoutes Last.fm récentes : un disque de pochettes, une carte du temps et une partition. Une seule page, pas de scroll, avec la direction artistique de mon portfolio.
+A small web project built for a school assignment. It's a single interactive page (Next.js) that turns your recent Shopify listens into a poster: a disc of album covers, a time map, and a music sheet.
 
-## Lancer
-
-```bash
-cp .env.example .env
-# mettre ta clé Last.fm dans LASTFM_API_KEY
-docker compose up --build
-```
-
-Ouvre **http://localhost:3001/wall-of-tracks**.
-
-Sans Compose :
+## Run locally
 
 ```bash
 npm install
@@ -20,21 +10,4 @@ cp .env.example .env
 npm run dev
 ```
 
-Ouvre **http://localhost:3000/wall-of-tracks**.
-
-Avec `docker run` direct :
-
-```bash
-docker build -t wall .
-docker run --rm --env-file .env -p 3001:3000 wall
-```
-
-Ouvre **http://localhost:3001/wall-of-tracks**. En production : `https://student07.wt.thomasjuldo.com/wall-of-tracks/`.
-
-Variables : `LASTFM_API_KEY` est requise, `LASTFM_USERNAME` est optionnelle, `PORT` default `3001` avec Compose.
-
-## Vérifier
-
-```bash
-npm run typecheck && npm run lint && npm run build
-```
+Add your `LASTFM_API_KEY` to `.env`, then open http://localhost:3000/wall-of-tracks.
