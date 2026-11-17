@@ -8,6 +8,8 @@ import { isErrorResponse, type ApiResponse, type Range, type TracksResponse } fr
 type RequestState = { range: Range; force: boolean; nonce: number };
 type Failure = { title: string; detail: string };
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export default function Home() {
   const [request, setRequest] = useState<RequestState>({ range: '24h', force: false, nonce: 0 });
   const [data, setData] = useState<TracksResponse | null>(null);
@@ -22,7 +24,7 @@ export default function Home() {
 
     const run = async () => {
       try {
-        const response = await fetch(`/api/tracks?${params.toString()}`, {
+        const response = await fetch(`${BASE_PATH}/api/tracks?${params.toString()}`, {
           cache: 'no-store',
           signal: controller.signal,
         });

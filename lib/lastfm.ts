@@ -3,6 +3,8 @@ import type { ConstellationData, Range, Scrobble, Stats } from './types';
 export const DEFAULT_USERNAME = 'jojjjjoooooooo';
 export const TRACK_CACHE_TTL_MS = 60_000;
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 const API_ROOT = 'https://ws.audioscrobbler.com/2.0/';
 const NO_ARTWORK_HASH = '2a96cbd8b46e442fc41c2b86b821562f';
 const FETCH_TIMEOUT_MS = 8_000;
@@ -42,7 +44,7 @@ function bestArtwork(images: RawImage[] | undefined): string | null {
 }
 
 function toProxyPath(sourceUrl: string): string {
-  return `/api/artwork?url=${encodeURIComponent(sourceUrl)}`;
+  return `${BASE_PATH}/api/artwork?url=${encodeURIComponent(sourceUrl)}`;
 }
 
 function computeStats(scrobbles: Scrobble[]): Stats {

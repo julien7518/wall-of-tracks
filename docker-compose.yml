@@ -9,7 +9,7 @@ services:
       LASTFM_API_KEY: ${LASTFM_API_KEY:-}
       LASTFM_USERNAME: ${LASTFM_USERNAME:-jojjjjoooooooo}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/wall-of-tracks/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3

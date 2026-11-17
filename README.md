@@ -10,7 +10,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Ouvre **http://localhost:3001**.
+Ouvre **http://localhost:3001/wall-of-tracks**.
 
 Sans Compose :
 
@@ -20,7 +20,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Ouvre **http://localhost:3000**.
+Ouvre **http://localhost:3000/wall-of-tracks**.
 
 Avec `docker run` direct :
 
@@ -28,6 +28,8 @@ Avec `docker run` direct :
 docker build -t wall .
 docker run --rm --env-file .env -p 3001:3000 wall
 ```
+
+Ouvre **http://localhost:3001/wall-of-tracks**. En production : `https://student07.wt.thomasjuldo.com/wall-of-tracks/`.
 
 Variables : `LASTFM_API_KEY` est requise, `LASTFM_USERNAME` est optionnelle, `PORT` default `3001` avec Compose.
 
