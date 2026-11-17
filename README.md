@@ -38,6 +38,15 @@ docker compose up --build
 
 Ouvre **http://localhost:3000**. Pour un autre port : `PORT=4000 docker compose up`.
 
+Si tu lances l’image directement sans Compose, il faut passer le `.env` au conteneur au moment du `docker run` :
+
+```bash
+docker build -t wall .
+docker run --rm --env-file .env -p 3000:3000 wall
+```
+
+Le `.env` est volontairement exclu de l’image par `.dockerignore` : Next.js le lit en local, mais Docker ne le charge pas tout seul. Composer l’injecte via `docker-compose.yml` ; avec `docker run`, c’est `--env-file .env` qui s’en charge.
+
 | Variable | Requise | Défaut | Rôle |
 | --- | --- | --- | --- |
 | `LASTFM_API_KEY` | oui | — | Clé API lue **uniquement par le serveur** |
