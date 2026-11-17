@@ -14,6 +14,8 @@ RUN npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+# Le serveur écoute toujours sur 3000 dans le conteneur.
+# Le port visible depuis l'hôte est choisi par Compose ou par `docker run -p`.
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \

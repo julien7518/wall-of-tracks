@@ -3,7 +3,7 @@ services:
     build: .
     image: wall-of-tracks:latest
     ports:
-      - "${PORT:-3000}:3000"
+      - "${PORT:-3001}:3000"
     environment:
       NODE_ENV: production
       LASTFM_API_KEY: ${LASTFM_API_KEY:-}

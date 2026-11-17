@@ -36,13 +36,13 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Ouvre **http://localhost:3000**. Pour un autre port : `PORT=4000 docker compose up`.
+Ouvre **http://localhost:3001**. Le port hôte par défaut est 3001 pour éviter un conflit avec un autre service déjà sur 3000. Pour un autre port : `PORT=4000 docker compose up`.
 
 Si tu lances l’image directement sans Compose, il faut passer le `.env` au conteneur au moment du `docker run` :
 
 ```bash
 docker build -t wall .
-docker run --rm --env-file .env -p 3000:3000 wall
+docker run --rm --env-file .env -p 3001:3000 wall
 ```
 
 Le `.env` est volontairement exclu de l’image par `.dockerignore` : Next.js le lit en local, mais Docker ne le charge pas tout seul. Composer l’injecte via `docker-compose.yml` ; avec `docker run`, c’est `--env-file .env` qui s’en charge.
@@ -51,7 +51,7 @@ Le `.env` est volontairement exclu de l’image par `.dockerignore` : Next.js le
 | --- | --- | --- | --- |
 | `LASTFM_API_KEY` | oui | — | Clé API lue **uniquement par le serveur** |
 | `LASTFM_USERNAME` | non | `jojjjjoooooooo` | Profil Last.fm interrogé |
-| `PORT` | non | `3000` | Port exposé par Compose |
+| `PORT` | non | `3001` | Port hôte exposé par Compose (le conteneur écoute toujours sur 3000) |
 
 Sans clé, l’application démarre quand même et affiche un message lisible plutôt qu’une page vide.
 
