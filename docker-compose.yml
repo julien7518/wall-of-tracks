@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: afterglow-constellation:latest
+    image: wall-of-tracks:latest
     ports:
       - "${PORT:-3000}:3000"
     environment:
