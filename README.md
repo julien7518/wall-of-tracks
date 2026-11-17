@@ -7,13 +7,13 @@ Une **affiche éditoriale** générée à partir des écoutes Last.fm récentes.
 - Le **nom de l’artiste dominant** occupe la moitié gauche comme un titre d’affiche, accompagné d’un empilement des **3 pochettes les plus récentes**.
 - Le **disque** est la pièce centrale : chaque album devient un sillon dont la largeur suit son temps d’écoute, et les sillons sont classés autour du cercle chromatique. Le centre affiche la pochette en cours, avec un reflet fixe et des rainures qui restent en place pendant la rotation — un clin d’œil à [Wall of Tracks](https://walloftrack.thomasjuldo.com/).
 - La **carte du temps** à droite place chaque écoute sur un cadran : l’angle donne le moment dans la période choisie, la distance au centre donne la minute (24 h) ou l’heure de la journée (7 j). La couleur vient de la pochette de l’album.
-- Le **bandeau d’albums**, en bas, montre les 12 pochettes les plus écoutées ; la **partition** qui suit convertit la période en traits fins, dont la hauteur donne le nombre d’écoutes par intervalle, et un **ticker** fait défiler les derniers titres.
-- Le curseur carré en `mix-blend-mode: difference`, les filets et l’entrée échelonnée reprennent les gestes du portfolio.
+- Le **bandeau d’albums**, en bas, montre les 12 pochettes les plus écoutées ; la **partition** qui suit convertit la période en traits fins, dont la hauteur donne le nombre d’écoutes par intervalle.
+- Le curseur carré du portfolio est repris à l’identique : 20 px, 30 px et rotation à 90° au survol d’un élément interactif, le tout en `mix-blend-mode: difference`.
 
 ### Interactions
 
 - Le sélecteur **DISQUE / TEMPS / ALBUMS** bascule entre le vinyle, la carte du temps et une mosaïque de pochettes animée.
-- Le **disque** tourne quand un morceau est en cours ; le bouton **ROTATION** permet de lancer ou arrêter le mouvement, et un double-clic bascule entre sillons francs et sillons organiques.
+- Le **disque** tourne quand un morceau est en cours ; un clic sur son centre lance ou arrête le mouvement, et un double-clic bascule entre sillons francs et sillons organiques.
 - Survoler un sillon met son album en avant ; cliquer l’épingle et remplace le grand titre. Cliquer le centre du disque commande la rotation.
 - Glisser sur le cadran déplace une tête de lecture orange et révèle l’écoute la plus proche.
 - `Échap` efface la sélection.
@@ -92,11 +92,12 @@ app/
   api/tracks/route.ts     proxy Last.fm, cache, repli sur erreur
   api/artwork/route.ts    proxy d’images avec liste blanche
   api/health/route.ts     healthcheck
-  page.tsx                navigation, état, messages, curseur
+  page.tsx                navigation, état, messages
   layout.tsx              polices Geist / Geist Mono / Instrument Serif
   globals.css             direction artistique papier
 components/
-  Poster.tsx              affiche, vues, partition, ticker
+  Cursor.tsx              curseur carré du portfolio
+  Poster.tsx              affiche, vues, partition
   Disc.tsx                disque vinyle, sillons, rotation
 lib/
   cache.ts                TTL + single-flight + cache d’octets borné
@@ -108,6 +109,6 @@ lib/
 
 ## Idée à défendre en démo (3 min)
 
-1. Montrer le disque qui tourne, lancer/arrêter la rotation, basculer en sillons organiques, épingler un album, glisser sur le cadran, passer en mosaïque puis de 24 h à 7 j.
+1. Montrer le disque qui tourne, cliquer son centre pour l’arrêter, basculer en sillons organiques, épingler un album, glisser sur le cadran, passer en mosaïque puis de 24 h à 7 j.
 2. « Je voulais une affiche, pas un dashboard : la même DA que mon portfolio, mais alimentée par ma musique. »
 3. Expliquer le trajet navigateur → serveur → Last.fm, la clé dans l’environnement, le cache 60 s et les pochettes proxied pour rester same-origin.

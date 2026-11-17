@@ -270,19 +270,7 @@ export default function Disc({
             })}
           </g>
 
-          <g
-            className="disc-label"
-            role="button"
-            tabIndex={interactive ? 0 : -1}
-            aria-label="Activer ou arrêter la rotation du disque"
-            onClick={onToggleSpin}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                onToggleSpin();
-              }
-            }}
-          >
+          <g className="disc-label" onClick={onToggleSpin}>
             <circle className="disc-label-base" cx={C} cy={C} r={R_LABEL} />
             {labelAlbum?.artwork && (
               <image
@@ -306,6 +294,30 @@ export default function Disc({
           <path className="disc-sheen" d={sectorPath(0.22, 0.62, R_OUT)} fill="url(#disc-sheen)" />
           <path className="disc-sheen" d={sectorPath(3.36, 3.76, R_OUT)} fill="url(#disc-sheen)" />
           <circle className="disc-spindle" cx={C} cy={C} r="6" />
+        </g>
+
+        <g
+          className="disc-control"
+          role="button"
+          tabIndex={interactive ? 0 : -1}
+          aria-label={spinning ? 'Arrêter la rotation' : 'Lancer la rotation'}
+          onClick={onToggleSpin}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onToggleSpin();
+            }
+          }}
+        >
+          <circle cx={C} cy={C + 26} r="13" fill="var(--paper)" opacity="0.88" />
+          {spinning ? (
+            <>
+              <rect className="disc-glyph" x={C - 6} y={C + 20} width="3" height="12" rx="0.5" />
+              <rect className="disc-glyph" x={C + 3} y={C + 20} width="3" height="12" rx="0.5" />
+            </>
+          ) : (
+            <path className="disc-glyph" d={`M ${C - 4} ${C + 20} L ${C + 7} ${C + 26} L ${C - 4} ${C + 32} Z`} />
+          )}
         </g>
 
         <circle className="disc-rim" cx={C} cy={C} r={R_OUT + 4} />

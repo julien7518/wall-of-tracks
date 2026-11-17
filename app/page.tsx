@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Cursor from '@/components/Cursor';
 import Poster from '@/components/Poster';
 import { isErrorResponse, type ApiResponse, type Range, type TracksResponse } from '@/lib/types';
 
@@ -12,45 +13,6 @@ export default function Home() {
   const [data, setData] = useState<TracksResponse | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
   const [loading, setLoading] = useState(true);
-  const cursorRef = useRef<HTMLDivElement>(null);
-
-  // Portfolio-style square cursor, only where a real pointer exists.
-  useEffect(() => {
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!finePointer || reducedMotion) return;
-
-    document.body.classList.add('has-custom-cursor');
-    let frame = 0;
-    let x = 0;
-    let y = 0;
-
-    const move = (event: PointerEvent) => {
-      x = event.clientX;
-      y = event.clientY;
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        cursorRef.current?.classList.add('is-visible');
-        cursorRef.current?.style.setProperty('transform', `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`);
-        frame = 0;
-      });
-    };
-
-    const over = (event: PointerEvent) => {
-      const target = event.target as HTMLElement | null;
-      cursorRef.current?.classList.toggle('is-over-action', Boolean(target?.closest('button, a, [role="button"]')));
-    };
-
-    window.addEventListener('pointermove', move, { passive: true });
-    document.addEventListener('pointerover', over);
-
-    return () => {
-      document.body.classList.remove('has-custom-cursor');
-      window.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerover', over);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -110,23 +72,12 @@ export default function Home() {
     setRequest((current) => ({ ...current, force: true, nonce: current.nonce + 1 }));
   };
 
-  const tone = failure ? 'bad' : data?.stale ? 'warn' : loading ? 'idle' : 'good';
-  const statusLabel = tone === 'good'
-    ? 'Données à jour'
-    : tone === 'warn'
-      ? 'Relevé enregistré'
-      : tone === 'bad'
-        ? 'Last.fm indisponible'
-        : 'Chargement';
-
   return (
     <div className="site">
       <header className="site-nav">
         <div className="nav-left">
           <span className="nav-mark" aria-hidden="true" />
           <span className="nav-title">WALL OF TRACKS</span>
-          <span className="nav-divider" aria-hidden="true">/</span>
-          <span className="nav-subtitle">LISTENING EDITION</span>
         </div>
 
         <div className="nav-right">
@@ -157,7 +108,6 @@ export default function Home() {
           >
             ↻
           </button>
-          <span className={`status status-${tone}`} role="status" aria-label={statusLabel} />
         </div>
       </header>
 
@@ -184,7 +134,7 @@ export default function Home() {
         ) : null}
       </main>
 
-      <div ref={cursorRef} className="cursor" aria-hidden="true" />
+      <Cursor />
     </div>
   );
 }

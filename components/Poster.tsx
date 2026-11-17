@@ -41,11 +41,6 @@ const timeFormat = new Intl.DateTimeFormat('fr-FR', {
   minute: '2-digit',
 });
 const weekdayFormat = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
-const dateFormat = new Intl.DateTimeFormat('fr-FR', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-});
 
 function polar(angle: number, radius: number) {
   return {
@@ -121,7 +116,6 @@ export default function Poster({ data }: Props) {
     [...artistCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? data.username;
   const current = scrobbles.find((item) => item.nowPlaying) ?? scrobbles[scrobbles.length - 1] ?? null;
   const heroCovers = [...albumList].sort((a, b) => b.lastAt - a.lastAt).slice(0, 3).reverse();
-  const ambientAlbums = albumList.slice(0, 3);
 
   const discAlbums: DiscAlbum[] = albumList.map((album) => ({
     key: album.key,
@@ -132,7 +126,6 @@ export default function Poster({ data }: Props) {
     color: album.color,
   }));
   const labelAlbum = current ? discAlbums.find((album) => album.key === albumKey(current)) ?? discAlbums[0] ?? null : null;
-  const tickerItems = scrobbles.slice(0, 14).map((item) => `${item.artist} — ${item.song}`);
 
   const coverAlbums = [...albumList]
     .slice(0, COVER_ALBUM_COUNT)
@@ -229,12 +222,15 @@ export default function Poster({ data }: Props) {
     };
   });
 
-  const editionDate = dateFormat.format(new Date(data.fetchedAt));
   const currentColor = current ? paletteFor(albumKey(current)).ink : 'var(--accent)';
   const displayTitle = focused?.album ?? heroArtist;
-  const displayDetail = focused
-    ? `${focused.artist} · ${focused.count} FOIS`
-    : editionDate;
+
+  const scoreLabels = [0, 0.5, 1].map((fraction) => {
+    const date = new Date(data.windowStart + fraction * span);
+    return isWeek
+      ? weekdayFormat.format(date).replace('.', '').toUpperCase()
+      : `${String(date.getHours()).padStart(2, '0')}H`;
+  });
 
   const toggleAlbum = (key: string) => {
     setFocusedAlbum((currentKey) => (currentKey === key ? null : key));
@@ -274,33 +270,12 @@ export default function Poster({ data }: Props) {
 
   return (
     <article className="poster" key={data.range}>
-      <div className="ambient" aria-hidden="true">
-        {(activeAlbum ? [activeAlbum, ...ambientAlbums.slice(0, 2)] : ambientAlbums).map((album, index) => (
-          <span
-            key={`${album.key}-${index}`}
-            style={{
-              background: `radial-gradient(circle at ${28 + index * 22}% ${36 + index * 12}%, ${paletteFor(album.key).glow} 0%, transparent 62%)`,
-              animationDelay: `${index * -9}s`,
-            }}
-          />
-        ))}
-      </div>
-
       <div className="poster-main">
         <section className="hero">
           <div>
             <p className="eyebrow">
               <span className="eyebrow-rule" aria-hidden="true" />
-              {focused ? (
-                <>
-                  ALBUM EN VUE
-                  <button type="button" className="focus-clear" onClick={() => setFocusedAlbum(null)}>
-                    × RETOUR
-                  </button>
-                </>
-              ) : (
-                <>ÉDITION DU JOUR · {rangeLabel}</>
-              )}
+              {focused ? 'ALBUM EN VUE' : 'ÉDITION DU JOUR'}
             </p>
             <h1 key={displayTitle}>
               {displayTitle}
@@ -309,7 +284,6 @@ export default function Poster({ data }: Props) {
           </div>
 
           <div className="hero-foot">
-            <p className="micro hero-date">{displayDetail}</p>
             {current && (
               <div className="now-playing">
                 <div className="cover-stack" aria-hidden="true">
@@ -334,9 +308,6 @@ export default function Poster({ data }: Props) {
                   ))}
                 </div>
                 <div className="now-copy">
-                  <span className="micro accent">
-                    {current.nowPlaying ? 'EN COURS' : 'DERNIÈRE ÉCOUTE'}
-                  </span>
                   <strong>{current.song}</strong>
                   <small>{current.artist}</small>
                 </div>
@@ -347,47 +318,31 @@ export default function Poster({ data }: Props) {
 
         <section className="chart" aria-label="Carte interactive des écoutes et des pochettes">
           <div className="panel-head">
-            <span className="micro">
-              {view === 'disc' ? 'LE DISQUE' : view === 'time' ? 'CARTE DU TEMPS' : 'MOSAÏQUE D’ALBUMS'}
-            </span>
-            <div className="chart-tools">
-              {view === 'disc' && (
-                <button
-                  type="button"
-                  className={`spin-toggle${spinning ? ' active' : ''}`}
-                  aria-pressed={spinning}
-                  aria-label={spinning ? 'Arrêter la rotation' : 'Lancer la rotation'}
-                  onClick={() => setSpinning((value) => !value)}
-                >
-                  {spinning ? '❙❙' : '▶'} ROTATION
-                </button>
-              )}
-              <div className="view-switch" role="group" aria-label="Vue">
-                <button
-                  type="button"
-                  className={view === 'disc' ? 'active' : ''}
-                  aria-pressed={view === 'disc'}
-                  onClick={() => setView('disc')}
-                >
-                  DISQUE
-                </button>
-                <button
-                  type="button"
-                  className={view === 'time' ? 'active' : ''}
-                  aria-pressed={view === 'time'}
-                  onClick={() => setView('time')}
-                >
-                  TEMPS
-                </button>
-                <button
-                  type="button"
-                  className={view === 'covers' ? 'active' : ''}
-                  aria-pressed={view === 'covers'}
-                  onClick={() => setView('covers')}
-                >
-                  ALBUMS
-                </button>
-              </div>
+            <div className="view-switch" role="group" aria-label="Vue">
+              <button
+                type="button"
+                className={view === 'disc' ? 'active' : ''}
+                aria-pressed={view === 'disc'}
+                onClick={() => setView('disc')}
+              >
+                DISQUE
+              </button>
+              <button
+                type="button"
+                className={view === 'time' ? 'active' : ''}
+                aria-pressed={view === 'time'}
+                onClick={() => setView('time')}
+              >
+                TEMPS
+              </button>
+              <button
+                type="button"
+                className={view === 'covers' ? 'active' : ''}
+                aria-pressed={view === 'covers'}
+                onClick={() => setView('covers')}
+              >
+                ALBUMS
+              </button>
             </div>
           </div>
 
@@ -624,30 +579,12 @@ export default function Poster({ data }: Props) {
                 </span>
                 <span className="muted">{activeAlbum.count} FOIS</span>
               </>
-            ) : (
-              <>
-                <span className="muted">
-                  {view === 'disc'
-                    ? 'SURVOLEZ UN SILLON · DOUBLE-CLIC : ORGANIQUE'
-                    : view === 'time'
-                      ? 'GLISSEZ SUR LE CADRAN'
-                      : 'CHOISISSEZ UNE POCHETTE'}
-                </span>
-                <span className="muted">
-                  {view === 'disc' ? (spinning ? 'EN ROTATION' : 'À L’ARRÊT') : isWeek ? 'JOUR / HEURE' : 'HEURE / MINUTE'}
-                </span>
-              </>
-            )}
+            ) : null}
           </div>
         </section>
       </div>
 
       <section className="score" aria-label="Pochettes et partition des écoutes">
-        <div className="panel-head">
-          <span className="micro">ALBUMS LES PLUS ÉCOUTÉS</span>
-          <span className="micro muted">PARTITION · {rangeLabel}</span>
-        </div>
-
         <div className="cover-ribbon">
           {ribbonAlbums.map((album, index) => (
             <button
@@ -662,14 +599,12 @@ export default function Poster({ data }: Props) {
               onBlur={() => setHoveredAlbum((key) => (key === album.key ? null : key))}
               onClick={() => toggleAlbum(album.key)}
             >
-              <span className="ribbon-index">{String(index + 1).padStart(2, '0')}</span>
               {album.artwork ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={album.artwork} alt="" />
               ) : (
                 <span className="ribbon-empty" style={{ background: album.color }} aria-hidden="true" />
               )}
-              <span className="ribbon-count">{album.count}</span>
             </button>
           ))}
         </div>
@@ -687,19 +622,10 @@ export default function Poster({ data }: Props) {
             </span>
           ))}
         </div>
-        <div className="ticker" aria-hidden="true">
-          <div className="ticker-track">
-            {[0, 1].map((copy) => (
-              <div className="ticker-group" key={copy}>
-                {tickerItems.map((item, index) => (
-                  <span key={`${copy}-${index}`}>
-                    <span className="ticker-mark">✳</span>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
+        <div className="score-labels" aria-hidden="true">
+          {scoreLabels.map((label, index) => (
+            <span key={index}>{label}</span>
+          ))}
         </div>
       </section>
     </article>
